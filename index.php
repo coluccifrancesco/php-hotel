@@ -50,17 +50,65 @@
         ?>
 
         <!-- Filtro per parcheggio -->
-        <!-- <form class="my-5">
-            <label></label>
-            <input>
-        </form> -->
+        <div class="my-5 mx-auto w-50 border border-dark-subtle border-2 rounded p-4">
 
+            <!-- Parcheggio? -->
+            <form action="index.php" method="get" class="d-flex justify-content-between align-items-center form-check">
+                <div>
+                    <label class="form-check-label">Hotel con parcheggio</label>
+                    <input type="checkbox" name="parkOnly" class="form-check-input"
+                        
+                        <?=
+                        // Shorthand rispetto a <?php echo
+                        
+                        // Se parkOnly è settato, l'input risulterà 'cheked', altrimenti no
+                        isset($_GET['parkOnly']) ? 'checked' : ''
+                    
+                        ?>
+                    >
+                </div>
+            
+                <button type="submit" class="btn btn-success">Applica filtri</button>
+            </form>
+
+        </div>
+        
+        <!-- Logica filtri -->
+        <?php
+        
+        // Array vuoto dove inserire elementi filtrati
+        $filteredHotels = [];
+        
+        // Prendo i parametri dall'url
+        $parkUrl = $_GET['parkOnly'];
+
+        //  SE HO IL PARAMETRO...
+        if (isset($parkUrl)){
+        
+            // ...per ogni hotel...
+            foreach($hotels as $hotel){
+                foreach($hotel as $key => $value){
+
+                    // ...se il parametro parking è vero lo aggiungo al nuovo array
+                    if($key === 'parking' && $value === true){
+                        $filteredHotels[] = $hotel;
+                    }
+                };
+            };
+
+            // Modifico l'array originale, probabilmente non la scelta migliore
+            $hotels = $filteredHotels;
+        }
+
+        ?>
+        
+        
         <!-- Visualizzazione hotel -->
-        <div class="mx-auto mt-5 w-50">
+        <section class="mx-auto mt-5 w-50">
             <ul class="list-unstyled">
                 <?php foreach($hotels as $hotel){
                         
-                    echo "<li class='p-4 border rounded my-4'>";
+                    echo "<li class='p-4 border border-dark-subtle border-2 rounded my-4'>";
                     echo "<div class='d-flex justify-content-between align-items-center gap-4'>";
                         
                         foreach($hotel as $key => $value){
@@ -69,11 +117,11 @@
                             if($key === 'name'){
                             
                                 echo "<div>";
-                                echo "<h4 class='m-0'>$value</h4>";
+                                echo "<h3 class='mb-1'>$value</h3>";
                             
                             } else if ($key === 'description') {
                             
-                                echo "<p class='m-0'>Info: $value</p>";
+                                echo "<p class='mb-2'>Info: $value</p>";
                             
                             } else if ($key === 'parking' && $value === true) {
                             
@@ -89,7 +137,7 @@
                             
                                 echo "<div>";
                                     echo "<div class='d-flex justify-content-end align-items-center'>";
-                                        echo "<h3 class='m-0 text-danger'>$value</h3>";
+                                        echo "<h3 class='mb-0 me-1 text-danger'>$value</h3>";
                                         echo "<p class='m-0'>/ 5 <span class='ps-2'>⭐️</span></p>";
                                     echo "</div>";
                             
@@ -97,7 +145,7 @@
                             
                                 echo "<div>";
                                     echo "<div class='d-flex justify-content-end align-items-center'>";
-                                        echo "<h3 class='m-0 text-success'>$value</h3>";
+                                        echo "<h3 class='mb-0 me-1 text-success'>$value</h3>";
                                         echo "<p class='m-0'>/ 5 <span class='ps-2'>⭐️</span></p>";
                                     echo "</div>";
                             
@@ -105,7 +153,7 @@
                             
                                 echo "<div>";
                                     echo "<div class='d-flex justify-content-end align-items-center'>";
-                                        echo "<h3 class='m-0 text-primary'>$value</h3>";
+                                        echo "<h3 class='mb-0 me-1 text-primary'>$value</h3>";
                                         echo "<p class='m-0'>/ 5 <span class='ps-2'>⭐️</span></p>";
                                     echo "</div>";
                             
@@ -137,7 +185,7 @@
                 }
                 ?>
             </ul>
-        </div>
+        </section>
 
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
