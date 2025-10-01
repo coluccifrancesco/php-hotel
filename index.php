@@ -49,11 +49,12 @@
             ];
         ?>
 
-        <!-- Filtro per parcheggio -->
+        <!-- Filtri -->
         <div class="my-5 mx-auto w-50 border border-dark-subtle border-2 rounded p-4">
 
-            <!-- Parcheggio? -->
-            <form action="index.php" method="get" class="d-flex justify-content-between align-items-center form-check">
+            <form action="" method="get" class="d-flex justify-content-between align-items-center form-check">
+                
+                <!-- Parcheggio -->
                 <div>
                     <label class="form-check-label">Hotel con parcheggio</label>
                     <input type="checkbox" name="parkOnly" class="form-check-input"
@@ -61,13 +62,28 @@
                         <?=
                         // Shorthand rispetto a <?php echo
                         
-                        // Se parkOnly è settato, l'input risulterà 'cheked', altrimenti no
+                        // Se parkOnly è settato, l'input risulterà 'checked', altrimenti no
                         isset($_GET['parkOnly']) ? 'checked' : ''
                     
                         ?>
                     >
                 </div>
             
+                <!-- Voto -->
+                <div class="w-25 d-flex align-items-center justify-content-center gap-3">
+                    <p class="mb-0">Voto</p>
+                    
+                    <select name="vote" class="form-select">
+                        <option value="null" selected></option>
+                        <option value="1" <?= isset($voteUrl) && $voteUrl == '1' ? 'selected' : '' ?>>1</option>
+                        <option value="2" <?= isset($voteUrl) && $voteUrl == '2' ? 'selected' : '' ?>>2</option>
+                        <option value="3" <?= isset($voteUrl) && $voteUrl == '3' ? 'selected' : '' ?>>3</option>
+                        <option value="4" <?= isset($voteUrl) && $voteUrl == '4' ? 'selected' : '' ?>>4</option>
+                        <option value="5" <?= isset($voteUrl) && $voteUrl == '5' ? 'selected' : '' ?>>5</option>
+                    </select>
+                </div> 
+
+                <!-- Bottone di invio filtri -->
                 <button type="submit" class="btn btn-success">Applica filtri</button>
             </form>
 
@@ -79,26 +95,49 @@
         // Array vuoto dove inserire elementi filtrati
         $filteredHotels = [];
         
-        // Prendo i parametri dall'url
-        $parkUrl = $_GET['parkOnly'];
+        // Prendo i parametri dall'url se ci sono, altrimenti 'null'
+        $parkUrl = $_GET['parkOnly'] ?? null;
+        $voteUrl = $_GET['vote'] ?? null;
 
-        //  SE HO IL PARAMETRO...
-        if (isset($parkUrl)){
-        
+        // Se il voto è null (valore standard), $voteUrl è nullo
+        if ($voteUrl == 'null') {
+            $voteUrl = null;
+        };
+
+        // Se nell'url rilevo dei parametri...
+        if (isset($parkUrl) || isset($voteUrl)){
+
             // ...per ogni hotel...
             foreach($hotels as $hotel){
-                foreach($hotel as $key => $value){
+                
+                // Variabile di validità
+                $filter = true;
+                
+                // Se $parkUrl è settato e non rispetta la condizione...
+                if (isset($parkUrl) && $hotel['parking'] != true) {
+                     
+                    // ...il filtro è falso
+                    $filter = false;
+                }   
+                
+                // Se $voteUrl è settato e non rispetta la condizione...
+                if (isset($voteUrl) && $hotel['vote']!= $voteUrl) {
+                        
+                    // ...il filtro è falso
+                    $filter = false;
+                }
 
-                    // ...se il parametro parking è vero lo aggiungo al nuovo array
-                    if($key === 'parking' && $value === true){
-                        $filteredHotels[] = $hotel;
-                    }
-                };
+                // Se il filtro è passato ai controlli...
+                if ($filter == true) {
+
+                    // ...l'hotel viene aggiunto alla lista degli hotel filtrati
+                    $filteredHotels[] = $hotel;
+                }
             };
-
-            // Modifico l'array originale, probabilmente non la scelta migliore
+            
+            // L'array originale prende i valori filtrati
             $hotels = $filteredHotels;
-        }
+        };
 
         ?>
         
@@ -149,7 +188,7 @@
                                         echo "<p class='m-0'>/ 5 <span class='ps-2'>⭐️</span></p>";
                                     echo "</div>";
                             
-                            } else if ($key === 'vote' && $value = 5) {
+                            } else if ($key === 'vote' && $value === 5) {
                             
                                 echo "<div>";
                                     echo "<div class='d-flex justify-content-end align-items-center'>";
